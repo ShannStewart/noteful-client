@@ -1,0 +1,11 @@
+h3, label{
+    color: white;
+}
+
+.errorSpace p{
+    color: tomato;
+}
+
+.hidden{
+    display: none;  
+}

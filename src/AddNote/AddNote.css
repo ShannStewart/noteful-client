@@ -1,0 +1,15 @@
+h3, label{
+    color: white;
+}
+
+#noteContent{
+    width: 75%;
+}
+
+.errorSpace p{
+    color: tomato;
+}
+
+.hidden{
+    display: none;  
+}
