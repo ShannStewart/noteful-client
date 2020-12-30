@@ -5,7 +5,7 @@ import NoteListNav from '../NoteListNav/NoteListNav';
 import NotePageNav from '../NotePageNav/NotePageNav';
 import NoteListMain from '../NoteListMain/NoteListMain';
 import NotePageMain from '../NotePageMain/NotePageMain';
-import dummyStore from '../dummy-store';
+//import dummyStore from '../dummy-store';
 import {getNotesForFolder, findNote, findFolder} from '../notes-helpers';
 import './App.css';
 
@@ -13,34 +13,80 @@ import AddFolder from '../AddFolder/AddFolder';
 import AddNote from '../AddNote/AddNote';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 
+import config from '../config'
+
+
 class App extends Component {
     state = {
         notes: [],
         folders: [],
-        noteID: 0,
-        folderID: 0
+        //noteID: 0,
+        //folderID: 0
     };
 
     componentDidMount() {
-        // fake date loading from API call
-        setTimeout(() => this.setState(dummyStore), 600);
-    }
-
+        Promise.all([
+          fetch(`${config.API_ENDPOINT}/notes`),
+          fetch(`${config.API_ENDPOINT}/folders`)
+        ])
+          .then(([notesRes, foldersRes]) => {
+            if (!notesRes.ok)
+              return notesRes.json().then(e => Promise.reject(e))
+            if (!foldersRes.ok)
+              return foldersRes.json().then(e => Promise.reject(e))
+    
+            return Promise.all([
+              notesRes.json(),
+              foldersRes.json(),
+            ])
+          })
+          .then(([notes, folders]) => {
+            this.setState({ notes, folders })
+          })
+          .catch(error => {
+            console.error({ error })
+          })
+      }
+    
     folderSubmit = (f) => {
-        //console.log("folderSubmit ran " + f);
+        console.log("folderSubmit ran " + f);
 
-        var newFolder = {"id": "newFolder" + this.state.folderID, "name": f};
+        //var newFolder = {"id": "newFolder" + this.state.folderID, "name": f};
 
-        var newFolderID = this.state.folderID + 1;
-        this.setState({folderID: newFolderID});
+        //var newFolderID = this.state.folderID + 1;
+        //this.setState({folderID: newFolderID});
 
 
         //console.log("adding folder: " + JSON.stringify(newFolder));
 
-        var newFolderList = this.state.folders.concat(newFolder);
+        //var newFolderList = this.state.folders.concat(newFolder);
         //console.log("new list: " + JSON.stringify(newFolderList));
-        this.setState({ folders: newFolderList });
-       
+        //this.setState({ folders: newFolderList });
+
+        const postfolder = {
+            method: 'POST',
+            body: JSON.stringify({ "name" : f })
+        };
+
+        const getFolder = {
+            method: 'GET'
+        };
+
+            fetch(`${config.API_ENDPOINT}/folders`, postfolder)
+            .then(
+                fetch(`${config.API_ENDPOINT}/folders`, getFolder)
+                    )
+                .then(res => {
+                    if (!res.ok)
+                    return res.json().then(e => Promise.reject(e))
+                })
+                .then(folders => {
+                    this.setState({folders : folders});
+                })
+                .catch( error =>{
+                    console.error({ error });   
+                    console.log("I fucked up the coding: 001");
+                });
     }
 
     noteSubmit = (n,c) => {
