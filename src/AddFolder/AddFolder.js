@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { NavLink, Link } from 'react-router-dom'
+//import { NavLink, Link } from 'react-router-dom'
 
 import './AddFolder.css';
 
@@ -7,7 +7,7 @@ export default class AddFolder extends Component{
   
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log("handleSubmit ran");
+    //console.log("handleSubmit ran");
 
     var nameError = document.getElementById("folderNameError");
 

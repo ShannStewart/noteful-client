@@ -47,46 +47,48 @@ class App extends Component {
             console.error({ error })
           })
       }
+
+    pageReload = () =>{
+        //console.log('pageReload ran');
+
+        Promise.all([
+            fetch(`${config.API_ENDPOINT}/notes`),
+            fetch(`${config.API_ENDPOINT}/folders`)
+          ])
+            .then(([notesRes, foldersRes]) => {
+              if (!notesRes.ok)
+                return notesRes.json().then(e => Promise.reject(e))
+              if (!foldersRes.ok)
+                return foldersRes.json().then(e => Promise.reject(e))
+      
+              return Promise.all([
+                notesRes.json(),
+                foldersRes.json(),
+              ])
+            })
+            .then(([notes, folders]) => {
+              this.setState({ notes, folders })
+            })
+            .catch(error => {
+              console.error({ error })
+            })
+    }
     
     folderSubmit = (f) => {
-        console.log("folderSubmit ran " + f);
+        //console.log("folderSubmit ran " + f);
 
-        //var newFolder = {"id": "newFolder" + this.state.folderID, "name": f};
-
-        //var newFolderID = this.state.folderID + 1;
-        //this.setState({folderID: newFolderID});
-
-
-        //console.log("adding folder: " + JSON.stringify(newFolder));
-
-        //var newFolderList = this.state.folders.concat(newFolder);
-        //console.log("new list: " + JSON.stringify(newFolderList));
-        //this.setState({ folders: newFolderList });
+        const newFolder = { "name" : f };
 
         const postfolder = {
             method: 'POST',
-            body: JSON.stringify({ "name" : f })
+            headers: {
+                'content-type': 'application/json'
+              },
+            body: JSON.stringify(newFolder)
         };
 
-        const getFolder = {
-            method: 'GET'
-        };
+        fetch(`${config.API_ENDPOINT}/folders`, postfolder).then(this.pageReload())
 
-            fetch(`${config.API_ENDPOINT}/folders`, postfolder)
-            .then(
-                fetch(`${config.API_ENDPOINT}/folders`, getFolder)
-                    )
-                .then(res => {
-                    if (!res.ok)
-                    return res.json().then(e => Promise.reject(e))
-                })
-                .then(folders => {
-                    this.setState({folders : folders});
-                })
-                .catch( error =>{
-                    console.error({ error });   
-                    console.log("I fucked up the coding: 001");
-                });
     }
 
     noteSubmit = (n,c) => {
