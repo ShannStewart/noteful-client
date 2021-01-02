@@ -8,16 +8,6 @@ import './NoteListMain.css'
 import PropTypes from 'prop-types';
 
 export default class NoteListMain extends Component {
-  constructor(props){
-    super(props);
-    NoteListMain.defaultProps = {
-      notes: [],
-    }
-    
-    NoteListMain.prototype = {
-      notes: PropTypes.array
-    };
-  }
   
   render(){
     return (
