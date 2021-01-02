@@ -48,30 +48,13 @@ class App extends Component {
           })
       }
 
-    pageReload = () =>{
-        //console.log('pageReload ran');
+    folderReload = (data) =>{
+        console.log('folderReload ran');
 
-        Promise.all([
-            fetch(`${config.API_ENDPOINT}/notes`),
-            fetch(`${config.API_ENDPOINT}/folders`)
-          ])
-            .then(([notesRes, foldersRes]) => {
-              if (!notesRes.ok)
-                return notesRes.json().then(e => Promise.reject(e))
-              if (!foldersRes.ok)
-                return foldersRes.json().then(e => Promise.reject(e))
-      
-              return Promise.all([
-                notesRes.json(),
-                foldersRes.json(),
-              ])
-            })
-            .then(([notes, folders]) => {
-              this.setState({ notes, folders })
-            })
-            .catch(error => {
-              console.error({ error })
-            })
+        var newFolder = {"id": data.id, "name": data.name};
+        var newFolderList = this.state.folders.concat(newFolder);
+        this.setState({ folders: newFolderList });
+        
     }
     
     folderSubmit = (f) => {
@@ -86,8 +69,10 @@ class App extends Component {
               },
             body: JSON.stringify(newFolder)
         };
-
-        fetch(`${config.API_ENDPOINT}/folders`, postfolder).then(this.pageReload())
+        
+        fetch(`${config.API_ENDPOINT}/folders`, postfolder)  
+        .then(response => response.json())
+        .then(data => this.folderReload(data))
 
     }
 
