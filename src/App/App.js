@@ -51,8 +51,8 @@ class App extends Component {
     folderReload = (data) =>{
         console.log('folderReload ran');
 
-        var newFolder = {"id": data.id, "name": data.name};
-        var newFolderList = this.state.folders.concat(newFolder);
+        var newFolderItem = {"id": data.id, "name": data.name};
+        var newFolderList = this.state.folders.concat(newFolderItem);
         this.setState({ folders: newFolderList });
         
     }
@@ -62,7 +62,7 @@ class App extends Component {
 
         const newFolder = { "name" : f };
 
-        const postfolder = {
+        const postFolder = {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'
@@ -70,25 +70,41 @@ class App extends Component {
             body: JSON.stringify(newFolder)
         };
         
-        fetch(`${config.API_ENDPOINT}/folders`, postfolder)  
+        fetch(`${config.API_ENDPOINT}/folders`, postFolder)  
         .then(response => response.json())
         .then(data => this.folderReload(data))
 
     }
 
-    noteSubmit = (n,c) => {
+    noteReload = (data) => {
+        console.log('noteReload ran');
+
+        var newNoteItem = {"id": data.id, "name": data.name, "content": data.content, "modified": data.modified, "folder": data.folder}
+
+        var newNoteList = this.state.notes.concat(newNoteItem);
+        this.setState({ notes: newNoteList});
+
+    }
+
+    noteSubmit = (n,c,f) => {
         console.log("noteSubmit ran");
 
         var date = new Date();
 
-        var newNote = {"id": "newNote" + this.state.noteID, "name": n, "modified": date, "content": c};
-        var newNoteID = this.state.noteID + 1;
-        this.setState({noteID: newNoteID});
+        const newNote = { "name": n, "content": c, "modified": date, "folder": f}
 
-        //console.log("new note: " + JSON.stringify(newNote));
+        const postNote = {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(newNote)
+        };
 
-        var newNoteList = this.state.notes.concat(newNote);
-        this.setState({ notes: newNoteList});
+        fetch(`${config.API_ENDPOINT}/notes`, postNote)  
+        .then(response => response.json())
+        .then(data => this.noteReload(data))
+
     }
 
     renderNavRoutes() {
@@ -168,7 +184,7 @@ class App extends Component {
                  <Route
                     path="/add-note"
                     render={routeProps => {
-                        return <AddNote addNewNote={this.noteSubmit}/> 
+                        return <AddNote addNewNote={this.noteSubmit} folders={this.state.folders}/> 
                     }}
                 />
                     </ErrorBoundary>
