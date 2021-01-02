@@ -107,6 +107,41 @@ class App extends Component {
 
     }
 
+    deleteReload = (data) => {
+        console.log('deleteReload ran');
+
+        var deletedNoteItem = data;
+
+        var oldNoteList = this.state.notes;
+
+        var removeNote = oldNoteList.map(function(item){return item.id}).indexOf(deletedNoteItem);
+
+        oldNoteList.splice(removeNote, 1);
+
+        //console.log("new list will be: " + oldNoteList);
+        
+        this.setState({ notes: oldNoteList });
+
+    }
+
+    handleNoteDelete = (n) => {
+        console.log("handleNoteDelete ran: " + n);
+
+        const deleteId = n;
+
+        const deleteNote = {
+            method: 'DELETE',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(deleteId)
+        }
+
+        fetch(`${config.API_ENDPOINT}/notes/${n}`, deleteNote)
+        .then(this.deleteReload(n))
+
+    }
+
     renderNavRoutes() {
         const {notes, folders} = this.state;
         return (
@@ -159,6 +194,7 @@ class App extends Component {
                                 <NoteListMain
                                     {...routeProps}
                                     notes={notesForFolder}
+                                    onDelete = {this.handleNoteDelete}
                                 />
                             );
                         }}
